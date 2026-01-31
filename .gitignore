@@ -97,3 +97,8 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+/GGJ2026/Library/Artifacts
+/GGJ2026/Library/Bee
+/GGJ2026/Library/BurstCache
+/GGJ2026/Library/PackageCache
+/GGJ2026/Library/ShaderCache
