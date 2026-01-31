@@ -13,14 +13,14 @@ public class MenuManager : MonoBehaviour
     [SerializeField] GameObject startButtonObject;
     Button startButton;
 
-    [Header("Background positions")]
-    [SerializeField] Vector3[] bgPositions;
 
     private void Awake()
     {
         GameStateManager.Instance.CurrentState = GameState.MAIN_MENU; //this is the main menu
         startButton = startButtonObject.GetComponent<Button>(); //Grab the button component from the start button object
         startButton.enabled = true;
+        startButton.onClick.AddListener(BeginCutscene); //Makes the button start the cutscene
+        selectBox.GetComponent<Button>().onClick.AddListener(selectBox.GetComponent<BoxButton>().OnButtonPressed);
 
         selectArrow.SetActive(false); //Force hide it
         selectBox.SetActive(false); //Same as above
@@ -33,21 +33,36 @@ public class MenuManager : MonoBehaviour
         //Disable the start button to prevent multiple clicks
         startButton.enabled = false;
         startButtonObject.SetActive(false);
+        StartCoroutine(StartCutscene());
     }
 
     private IEnumerator StartCutscene()
     {
-        if (bgPositions.Length == 0 || bgPositions == null)
+        yield return new WaitForSeconds(1f); //Wait a bit before starting
+
+        int maxIterations = 60;
+        int i = 1;
+        while (i < maxIterations)
         {
-            Debug.LogError($"Error! No positions for BG, aborting");
-            yield break; //No positions to move to
-        }
-        int i = 0;
-        while (i < bgPositions.Length)
-        {
-            menuBackground.transform.localPosition = bgPositions[i];
+            float t = (i / (float)maxIterations) * 2 - 1f;
+            float power = 1f - Mathf.Pow(Mathf.Sin(t * Mathf.PI * 0.5f),2);
+            float xOffset = Random.Range(-30 * power, 31 * power);
+            float yOffset = Random.Range(-30 * power, 31 * power);
+
+            Vector3 newPosition = new Vector3(xOffset , yOffset, 0);
+            menuBackground.transform.localPosition = newPosition;
             i++;
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.03f);
         }
+        menuBackground.transform.localPosition = Vector3.zero;
+
+        selectArrow.SetActive(true); //Show it
+        yield return new WaitForSeconds(0.7f);
+        selectBox.SetActive(true); //Show this too
+        yield return new WaitUntil(() => selectBox.GetComponent<BoxButton>().WaitPressed); //Wait for the box button to be pressed
+
+        selectArrow.SetActive(false); //Hide it
+        selectBox.SetActive(false); //Hide this too
+        dialBox.SetActive(true); //Show the dialogue box
     }
 }
