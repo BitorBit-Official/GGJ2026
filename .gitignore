@@ -102,3 +102,6 @@ InitTestScene*.unity*
 /GGJ2026/Library/BurstCache
 /GGJ2026/Library/PackageCache
 /GGJ2026/Library/ShaderCache
+/GGJ2026/Library
+/GGJ2026/obj
+/GGJ2026/Temp
