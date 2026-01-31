@@ -14,6 +14,8 @@ public class MenuManager : MonoBehaviour
     Button startButton;
 
 
+    readonly string startingDialogue;
+
     private void Awake()
     {
         GameStateManager.Instance.CurrentState = GameState.MAIN_MENU; //this is the main menu
@@ -64,5 +66,6 @@ public class MenuManager : MonoBehaviour
         selectArrow.SetActive(false); //Hide it
         selectBox.SetActive(false); //Hide this too
         dialBox.SetActive(true); //Show the dialogue box
+        mapProp.SetActive(true); //And the map prop
     }
 }
