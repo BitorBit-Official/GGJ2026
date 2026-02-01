@@ -8,7 +8,6 @@ public class Player : MonoBehaviour
     [SerializeField] Sprite unmasked;
     [SerializeField] Sprite masked;
     int lives; //Private integer holding the current number of lives.
-    RectTransform rectTransform;
     Rigidbody2D rb;
     bool _isMasked; //Boolean that says whether this player has the mask on or not.
     public bool isMasked //This is a property.
@@ -21,7 +20,8 @@ public class Player : MonoBehaviour
             onMaskEquipChange?.Invoke(); //And then fire the event
         }
     }
-    (float current, float getMasked, float cannotMaskFor) cooldown = (2,3, 2); //This is a tuple that holds multiple values for the same variable.
+    (float current, float getMasked, float cannotMaskFor) cooldown = (0,3, 2); //This is a tuple that holds multiple values for the same variable.
+    bool maskIsCoolingDown;
     SpriteRenderer spriteRenderer;
 
     public event Action onMaskEquipChange;
@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
 
     InputAction move;
     InputAction interact;
+    InputAction mask;
     House examiningHouse;
 
     readonly Vector3 defaultPosition = new Vector3(991.174438f,543.144531f,0);
@@ -49,10 +50,10 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        rectTransform = GetComponent<RectTransform>();
         rb = GetComponent<Rigidbody2D>();
         move = InputSystem.actions.FindAction("Move");
         interact = InputSystem.actions.FindAction("Interact");
+        mask = InputSystem.actions.FindAction("Mask");
         interact.Disable();
     }
 
@@ -74,15 +75,35 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (cooldown.current > 0) cooldown.current -= Time.deltaTime; //Do the cooldown only while it's not 0
+        if (cooldown.current > 0) 
+        {
+            cooldown.current -= Time.deltaTime; //Do the cooldown only while it's not 0
+            if (isMasked) MaskStatus.Instance.maskBar.fillAmount = (cooldown.current / cooldown.getMasked); //Handle only when masked
+        }
+
         else
         {
-            if (isMasked) isMasked = false; //Disable the mask. With the property field and checking this is actually set to true, it should only do it once.
+            if (isMasked)
+            {
+                isMasked = false; //Disable the mask. With the property field and checking this is actually set to true, it should only do it once.
+                maskIsCoolingDown = true; //The mask is cooling down.
+            }
+            else if (maskIsCoolingDown)
+            {
+                MaskStatus.Instance.maskBar.fillAmount = 1; //Snap back to full
+                maskIsCoolingDown = false; //And the mask is no longer on cooldown
+            }
         }
 
         if (interact.WasPressedThisFrame() && (examiningHouse != null && !examiningHouse.wasChecked))
         {
             examiningHouse.ExamineHouse();
+        }
+
+        if (mask.WasPressedThisFrame() && cooldown.current <= 0)
+        {
+            Debug.Log("Attempt mask");
+            isMasked = true;
         }
     }
 
