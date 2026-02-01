@@ -10,6 +10,8 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] List<Transform> enemySpawnPoints;
     [SerializeField] Player playerPrefab;
     [SerializeField] Image healthBar;
+    [SerializeField] GameObject gameOverPanel;
+    [SerializeField] GameObject winPanel;
     public event Action onLevelStart;
 
     GameObject player;
@@ -29,9 +31,12 @@ public class GameplayManager : MonoBehaviour
     }
     private void LevelStart()
     {
+        gameOverPanel.SetActive(false);
+        winPanel.SetActive(false);
         //This is the place where level setup logic lives. We're doing the houses here.
         int randomHouse = UnityEngine.Random.Range(0, houses.Count); //Get a random index.
         houses[randomHouse].HasCaptive = true; //Then, set the house at that index as the winning one.
+        houses[randomHouse].onCaptiveRescued += LevelWin;
         Debug.Log($"Set house at index {randomHouse} as winning: {houses[randomHouse].name}");
 
         //The enemies and players will run their own methods when onLevelStart is fired, again by subscribing to it.
@@ -41,5 +46,14 @@ public class GameplayManager : MonoBehaviour
     {
         Debug.Log($"Update life bar: {lives} / {maxLives}");
         healthBar.fillAmount = ((float)lives / maxLives);
+        if (lives <= 0)
+        {
+            gameOverPanel.SetActive(true);
+        }
+    }
+
+    private void LevelWin()
+    {
+        
     }
 }

@@ -31,7 +31,7 @@ public class Player : MonoBehaviour
     InputAction interact;
     House examiningHouse;
 
-    readonly Vector3 defaultPosition = new Vector3(991.174438f,540.144531f,0);
+    readonly Vector3 defaultPosition = new Vector3(991.174438f,543.144531f,0);
 
     private void OnEnable()
     {

@@ -1,11 +1,16 @@
+
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
     [SerializeField] LayerMask wallAndPlayerMask;
-    [SerializeField] float speed;
+    [SerializeField] List<Transform> waypoints;
+    [SerializeField] float chaseSpeed;
+    [SerializeField] float patrolSpeed;
     GameObject playerObject;
     Rigidbody2D rb;
+    int currentWaypoint;
 
     private void Awake()
     {
@@ -31,6 +36,10 @@ public class Enemy : MonoBehaviour
 
         if (hit && hit.collider.CompareTag("Player") && playerObject == null)
         {
+            AudioSource audioSource;
+            TryGetComponent<AudioSource>(out audioSource);
+                audioSource.Play();
+            print("svira muzika");
             playerObject = hit.collider.gameObject;
         }
     }
@@ -48,7 +57,16 @@ public class Enemy : MonoBehaviour
     {
         if (playerObject != null)
         {
-            rb.position = Vector2.MoveTowards(rb.position, playerObject.GetComponent<Rigidbody2D>().position, speed);
+            rb.position = Vector2.MoveTowards(rb.position, playerObject.GetComponent<Rigidbody2D>().position, chaseSpeed);
+        }
+        else
+        {
+            rb.position = Vector2.MoveTowards(rb.position, waypoints[currentWaypoint].position, patrolSpeed);
+            if (rb.position == (Vector2)waypoints[currentWaypoint].position)
+            {
+                currentWaypoint++;
+                if (currentWaypoint >= waypoints.Count) currentWaypoint = 0;
+            }
         }
     }
 }
