@@ -107,6 +107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 764e0159fda09a84ab2facc49589d293, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::House
+  questionMark: {fileID: 5427966193975440393}
+  wasChecked: 0
 --- !u!61 &6922233292932299417
 BoxCollider2D:
   m_ObjectHideFlags: 0

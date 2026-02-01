@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
 
     InputAction move;
     InputAction interact;
+    House examiningHouse;
 
     readonly Vector3 defaultPosition = new Vector3(991.174438f,540.144531f,0);
 
@@ -77,9 +78,9 @@ public class Player : MonoBehaviour
             if (isMasked) isMasked = false; //Disable the mask. With the property field and checking this is actually set to true, it should only do it once.
         }
 
-        if (interact.WasPressedThisFrame())
+        if (interact.WasPressedThisFrame() && (examiningHouse != null && !examiningHouse.wasChecked))
         {
-            Debug.Log($"[{gameObject.name}]The interact button was pressed");
+            examiningHouse.ExamineHouse();
         }
     }
 
@@ -105,11 +106,19 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log($"Entered collision with {other.gameObject.name}");
-        interact.Enable();
+        if (other.gameObject.TryGetComponent(out House house))
+        {
+            examiningHouse = house;
+            interact.Enable();
+        }
     }
     private void OnTriggerExit2D(Collider2D other)
     {
         Debug.Log($"Exited collision with {other.gameObject.name}");
-        interact.Disable();
+        if (examiningHouse != null) //Assumes it's exiting collision with one of the houses
+        {
+            interact.Disable();
+            examiningHouse = null;
+        }
     }
 }
