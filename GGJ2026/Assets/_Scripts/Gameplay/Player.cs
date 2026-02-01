@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
     RectTransform rectTransform;
     Rigidbody2D rb;
     bool _isMasked; //Boolean that says whether this player has the mask on or not.
-    bool isMasked //This is a property.
+    public bool isMasked //This is a property.
     {
         get => _isMasked; //Delegate the getter to isMasked.
         set
@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
     SpriteRenderer spriteRenderer;
 
     public event Action onMaskEquipChange;
+    public event Action<int, int> onLivesChanged;
 
     InputAction move;
     InputAction interact;
@@ -60,6 +61,7 @@ public class Player : MonoBehaviour
         lives = startingLives; //Reset the lives to starting lives
         isMasked = false;
         transform.position = defaultPosition; //Reset position
+        onLivesChanged?.Invoke(lives, startingLives);
     }
 
     void ToggleMaskSprite()
@@ -105,7 +107,6 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"Entered collision with {other.gameObject.name}");
         if (other.gameObject.TryGetComponent(out House house))
         {
             examiningHouse = house;
@@ -114,11 +115,22 @@ public class Player : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        Debug.Log($"Exited collision with {other.gameObject.name}");
         if (examiningHouse != null) //Assumes it's exiting collision with one of the houses
         {
             interact.Disable();
             examiningHouse = null;
         }
+    }
+
+    public void LoseLife()
+    {
+        lives = Mathf.Clamp(lives-1,0,startingLives);
+        onLivesChanged?.Invoke(lives, startingLives);
+    }
+
+    public void GetLife()
+    {
+        lives = Mathf.Clamp(lives+1, 0, startingLives);
+        onLivesChanged?.Invoke(lives, startingLives);
     }
 }
