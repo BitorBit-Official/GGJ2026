@@ -25,8 +25,8 @@ public class GameplayManager : MonoBehaviour
     {
         //GameStateManager.Instance.CurrentState = GameState.IN_GAME;
         Instance = this;
-        onLevelStart?.Invoke(); //Fire the onLevelStart event - this means any method subscribed to this event, such as LevelStart above.
         player = Instantiate(playerPrefab.gameObject,gameObject.transform); //Auto-create the player instance and set it to the thing
+        onLevelStart?.Invoke(); //Fire the onLevelStart event - this means any method subscribed to this event, such as LevelStart above.
     }
     private void LevelStart()
     {
@@ -47,4 +47,27 @@ public class GameplayManager : MonoBehaviour
     {
         IsWinningHouse(house);
     }
+
+    public bool DoesIntersect(RectTransform a, RectTransform b)
+    {
+        Rect rectA = a.rect;
+        Rect rectB = b.rect;
+
+        rectA.position += (Vector2)a.position;
+        rectB.position += (Vector2)b.position;
+
+        return rectA.Overlaps(rectB);
+    }
+
+    public RectTransform Intersects(RectTransform a, RectTransform b)
+    {
+        Rect rectA = a.rect;
+        Rect rectB = b.rect;
+
+        rectA.position += (Vector2)a.position;
+        rectB.position += (Vector2)b.position;
+
+        return rectA.Overlaps(rectB) ? b : null;
+    }
+
 }

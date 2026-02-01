@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class Player : MonoBehaviour
     [SerializeField] Sprite masked;
     int lives; //Private integer holding the current number of lives.
     RectTransform rectTransform;
+    Rigidbody2D rb;
     bool _isMasked; //Boolean that says whether this player has the mask on or not.
     bool isMasked //This is a property.
     {
@@ -23,6 +25,11 @@ public class Player : MonoBehaviour
     SpriteRenderer spriteRenderer;
 
     public event Action onMaskEquipChange;
+
+    InputAction move;
+    InputAction interact;
+
+    readonly Vector3 defaultPosition = new Vector3(991.174438f,540.144531f,0);
 
     private void OnEnable()
     {
@@ -41,13 +48,17 @@ public class Player : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         rectTransform = GetComponent<RectTransform>();
+        rb = GetComponent<Rigidbody2D>();
+        move = InputSystem.actions.FindAction("Move");
+        interact = InputSystem.actions.FindAction("Interact");
+        interact.Disable();
     }
 
     void LevelStart()
     {
         lives = startingLives; //Reset the lives to starting lives
         isMasked = false;
-        transform.position = Vector3.zero; //Reset position
+        transform.position = defaultPosition; //Reset position
     }
 
     void ToggleMaskSprite()
@@ -65,6 +76,17 @@ public class Player : MonoBehaviour
         {
             if (isMasked) isMasked = false; //Disable the mask. With the property field and checking this is actually set to true, it should only do it once.
         }
+
+        if (interact.WasPressedThisFrame())
+        {
+            Debug.Log($"[{gameObject.name}]The interact button was pressed");
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        Vector2 moveDir = move.ReadValue<Vector2>();
+        rb.linearVelocity = moveDir * 200f;
     }
 
     void HandleMask()
@@ -78,5 +100,16 @@ public class Player : MonoBehaviour
         {
             cooldown.current = cooldown.cannotMaskFor; //Sets the cooldown, by isMasked being false it assumes it was just set to that thanks to the property field.
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log($"Entered collision with {other.gameObject.name}");
+        interact.Enable();
+    }
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        Debug.Log($"Exited collision with {other.gameObject.name}");
+        interact.Disable();
     }
 }
