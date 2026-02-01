@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
             onMaskEquipChange?.Invoke(); //And then fire the event
         }
     }
-    (float current, float getMasked, float cannotMaskFor) cooldown = (0,3, 2); //This is a tuple that holds multiple values for the same variable.
+    (float current, float getMasked, float cannotMaskFor) cooldown = (0,3, 5); //This is a tuple that holds multiple values for the same variable.
     bool maskIsCoolingDown;
     SpriteRenderer spriteRenderer;
 
@@ -155,3 +155,8 @@ public class Player : MonoBehaviour
         onLivesChanged?.Invoke(lives, startingLives);
     }
 }
+
+
+
+//stvari za dodati: interaction button (kada si blizu zgrade koju želiš otkriti (i dok si blizu da se prikaže) aka npr e ili f), button za cancelanje
+//(isti gumb za aktiviranje, kliknem ga opet za 1 sek i onda imam samo 2 sek cooldown ali ga tretira kao da je prazna), zamijeni mask button (m) sa space

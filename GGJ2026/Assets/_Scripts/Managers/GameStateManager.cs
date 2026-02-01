@@ -1,4 +1,6 @@
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum GameState
 {
@@ -10,7 +12,7 @@ public enum GameState
 public class GameStateManager : MonoBehaviour
 {
     public static GameStateManager Instance { get; set; }
-
+    InputAction exit;
     public GameState CurrentState { get; set; } = GameState.MAIN_MENU; //default state
 
     private void Awake()
@@ -25,5 +27,18 @@ public class GameStateManager : MonoBehaviour
         DontDestroyOnLoad(Instance);
 
         Debug.Log($"Set up game state manager with a state of {CurrentState}");
+
+        exit = InputSystem.actions.FindAction("Exit");
+    }
+
+    private void Update()
+    {
+        if (exit.WasPressedThisFrame())
+        {
+#if UNITY_EDITOR
+            EditorApplication.ExitPlaymode();
+#endif
+            Application.Quit();
+        }
     }
 }
